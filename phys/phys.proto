@@ -1,0 +1,65 @@
+syntax = "proto2";
+
+package phys;
+
+option go_package = "github.com/aif-go/agproto-spec/phys";
+
+import "google/protobuf/descriptor.proto";
+
+// ── 枚举 ──
+
+enum PadMode {
+    PAD_UNSPECIFIED = 0;
+    PAD_LEFT  = 1;
+    PAD_RIGHT = 2;
+}
+
+enum SourceFormat {
+    FORMAT_UNSPECIFIED = 0;
+    FORMAT_FIXED       = 1;
+    FORMAT_DELIMITED   = 2;
+}
+
+// ── 字段级: 一个嵌套 message 替代扁平的多个独立 option ──
+
+message FieldLayout {
+    optional int32   offset    = 1;
+    optional int32   length    = 2;
+    optional PadMode pad       = 3;
+    optional string  fill      = 4;
+    optional string  format    = 5;
+    optional int32   precision = 6;
+    optional string  target    = 7;
+    optional bool    skip      = 8;
+    optional int32   index     = 9;
+}
+
+// ── 消息级: 源文件属性 ──
+
+message SourceConfig {
+    optional SourceFormat format         = 1;
+    optional string       delimiter      = 2;
+    optional int32        skip_header    = 3;
+    optional int32        skip_trailer   = 4;
+    optional string       file_encoding  = 5;
+    optional string       line_separator = 6;
+}
+
+// ── 消息级: 输出文件属性 ──
+
+message OutputConfig {
+    optional bool   header   = 1;
+    optional bool   trailer  = 2;
+    optional string encoding = 3;
+}
+
+// ── 注册到 proto options ──
+
+extend google.protobuf.FieldOptions {
+    optional FieldLayout layout = 50001;
+}
+
+extend google.protobuf.MessageOptions {
+    optional SourceConfig source = 50001;
+    optional OutputConfig output = 50002;
+}
