@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package demo;
+
+option go_package = "github.com/aif-go/agproto-spec/demo";
+
+import "phys/phys.proto";
+
+// ── 演示：银行批量激活文件（GBK 定长）→ B2O 标准接口（UTF-8 分隔符）──
+
+// 源：银行上游批量文件（GBK 定长）
+message DemoSource {
+    optional string cardNo   = 1 [(phys.layout) = {index: 1, length: 19, pad: PAD_LEFT, fill: "0", target: "cardNo"}];
+    optional string custName = 2 [(phys.layout) = {index: 2, length: 20, target: "custName"}];
+    optional string txnAmt   = 3 [(phys.layout) = {index: 3, length: 15, pad: PAD_LEFT, fill: "0", type: TYPE_DECIMAL, precision: 2, target: "amt"}];
+    optional string bizDate  = 4 [(phys.layout) = {index: 4, length: 8, type: TYPE_DATE, date_pattern: DATE_PATTERN_YYYYMMDD, target: "bizDate"}];
+    optional string filler   = 5 [(phys.layout) = {index: 5, length: 5, skip: true}];
+    option (phys.file) = {format: FORMAT_FIXED, encoding: "GBK"};
+}
+
+// 标准：B2O 标准接口（UTF-8 分隔符）
+message DemoStandard {
+    optional string cardNo   = 1 [(phys.layout) = {index: 1}];
+    optional string custName = 2 [(phys.layout) = {index: 2}];
+    optional string amt      = 3 [(phys.layout) = {index: 3, type: TYPE_DECIMAL, precision: 2, decimal_mode: DECIMAL_MODE_EXPLICIT}];
+    optional string bizDate  = 4 [(phys.layout) = {index: 4, type: TYPE_DATE, date_pattern: DATE_PATTERN_YYYYMMDD}];
+    option (phys.file) = {format: FORMAT_DELIMITED, delimiter: "|", encoding: "UTF-8"};
+}
