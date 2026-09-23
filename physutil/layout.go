@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"sort"
 
+	"golang.org/x/text/encoding"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
@@ -35,6 +36,9 @@ type CachedLayout struct {
 	desc      protoreflect.MessageDescriptor
 	format    phys.SourceFormat
 	delimiter string
+	encoding  string
+	decoder   *encoding.Decoder // 缓存单例（x/text 无状态，并发安全已验证）
+	encoder   *encoding.Encoder
 	fields    []CachedField
 	byName    map[string]int
 	byIndex   map[int32]int
@@ -42,6 +46,7 @@ type CachedLayout struct {
 
 func (l *CachedLayout) Format() phys.SourceFormat { return l.format }
 func (l *CachedLayout) Delimiter() string         { return l.delimiter }
+func (l *CachedLayout) Encoding() string          { return l.encoding }
 func (l *CachedLayout) Fields() []CachedField     { return l.fields }
 func (l *CachedLayout) Field(name string) (CachedField, bool) {
 	i, ok := l.byName[name]
@@ -82,14 +87,25 @@ func BuildCachedLayout(desc protoreflect.MessageDescriptor) (*CachedLayout, erro
 		byName:    make(map[string]int),
 	}
 
-	// 消息级 FileFormat 注解
+	// 编码解析：查注册表（缺省 UTF-8），未知 → 构建报错（fail-fast）
+	enc := "UTF-8"
 	if mdOpts := desc.Options(); mdOpts != nil && proto.HasExtension(mdOpts, phys.E_File) {
 		ff := proto.GetExtension(mdOpts, phys.E_File).(*phys.FileFormat)
 		if ff.GetFormat() != phys.SourceFormat_FORMAT_UNSPECIFIED {
 			layout.format = ff.GetFormat()
 		}
 		layout.delimiter = ff.GetDelimiter()
+		if ff.GetEncoding() != "" {
+			enc = ff.GetEncoding()
+		}
 	}
+	e, ok := LookupEncoding(enc)
+	if !ok {
+		return nil, fmt.Errorf("unsupported encoding %q (register via RegisterEncoding)", enc)
+	}
+	layout.encoding = enc
+	layout.decoder = e.NewDecoder() // 缓存单例：构建时一次，逐行零分配
+	layout.encoder = e.NewEncoder()
 
 	// 分隔符格式必须声明非空 delimiter（空串 Split 会按 rune 切分，静默错乱）
 	if layout.format == phys.SourceFormat_FORMAT_DELIMITED && layout.delimiter == "" {

@@ -166,6 +166,25 @@ message BareField {
     option (phys.file) = {format: FORMAT_FIXED};
 }
 
+// ── 编码（x/text 体系）──
+
+message EncFixed {
+    optional string name = 1 [(phys.layout) = {index: 1, length: 20}];
+    optional string card = 2 [(phys.layout) = {index: 2, length: 19, pad: PAD_LEFT, fill: "0"}];
+    option (phys.file) = {format: FORMAT_FIXED, encoding: "GBK"};
+}
+
+message EncDelimited {
+    optional string name = 1 [(phys.layout) = {index: 1}];
+    optional string card = 2 [(phys.layout) = {index: 2}];
+    option (phys.file) = {format: FORMAT_DELIMITED, delimiter: "|", encoding: "GBK"};
+}
+
+message EncUnknown {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 5}];
+    option (phys.file) = {format: FORMAT_FIXED, encoding: "NOSUCH"};
+}
+
 // ── 映射（target/skip）──
 
 message MapSrc {

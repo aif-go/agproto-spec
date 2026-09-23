@@ -1,9 +1,11 @@
 package physutil
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -11,8 +13,9 @@ import (
 	"github.com/aif-go/agproto-spec/phys"
 )
 
-// ParseLine 定长行 → DTO：按 CachedField 切字节、trim、kind 转换、Set。
+// ParseLine 定长行 → DTO：按 CachedField 切字节、解码、trim、kind 转换、Set。
 // 有值模型：空内容 Set 类型零值（非 nil）；行短 → error（B1）。
+// 编码时机：先切后解码（offset/length 是源编码字节宽度）。
 func ParseLine(layout *CachedLayout, dest proto.Message, line []byte) error {
 	ref := dest.ProtoReflect()
 	if layout.desc != ref.Descriptor() {
@@ -24,16 +27,32 @@ func ParseLine(layout *CachedLayout, dest proto.Message, line []byte) error {
 			return fmt.Errorf("field %q: line too short (%d bytes), need offset %d + length %d = %d",
 				cf.FieldName, len(line), cf.Offset, cf.Length, end)
 		}
-		if err := setField(ref, cf, line[cf.Offset:end]); err != nil {
+		raw := line[cf.Offset:end]
+		dec, err := layout.decoder.Bytes(raw)
+		if err != nil {
+			return fmt.Errorf("field %q: decode: %w", cf.FieldName, err)
+		}
+		if err := checkFFFD(dec); err != nil {
+			return fmt.Errorf("field %q: %w", cf.FieldName, err)
+		}
+		if err := setField(ref, cf, dec); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-// ParseDelimitedLine 分隔符行 → DTO：Split 后按 index 取列（1-based），后续与定长共用。
+// ParseDelimitedLine 分隔符行 → DTO：整行解码后 Split（UTF-8 多字节不含 ASCII delimiter 字节，
+// GBK 双字节第二字节可含 0x7C——原始字节 Split 会错切）。
 func ParseDelimitedLine(layout *CachedLayout, dest proto.Message, line []byte) error {
-	parts := strings.Split(string(line), layout.Delimiter())
+	dec, err := layout.decoder.Bytes(line)
+	if err != nil {
+		return fmt.Errorf("decode: %w", err)
+	}
+	if err := checkFFFD(dec); err != nil {
+		return err
+	}
+	parts := strings.Split(string(dec), layout.Delimiter())
 	ref := dest.ProtoReflect()
 	if layout.desc != ref.Descriptor() {
 		return fmt.Errorf("layout was built for %q, not %q", layout.desc.FullName(), ref.Descriptor().FullName())
@@ -45,6 +64,15 @@ func ParseDelimitedLine(layout *CachedLayout, dest proto.Message, line []byte) e
 		if err := setField(ref, cf, []byte(parts[cf.Index-1])); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+// checkFFFD 解码后检测 U+FFFD 替换符（x/text 对非法字节/无法映射字节替换为 U+FFFD，
+// 检测 → error 等效 fail-fast。合法内容含 U+FFFD 字符会误报——银行文件概率≈0，文档注明）。
+func checkFFFD(dec []byte) error {
+	if bytes.Contains(dec, []byte(string(utf8.RuneError))) {
+		return fmt.Errorf("decoded bytes contain U+FFFD (encoding mismatch?)")
 	}
 	return nil
 }

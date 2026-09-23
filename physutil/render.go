@@ -13,6 +13,7 @@ import (
 
 // RenderLine 定长：按 offset 定位写（§5.2）。
 // 行长 = max(offset+length)；先 fill（空格）填充；skip/空值字段不写，位置保持 fill。
+// 编码时机：先编码后 pad/截断（length 是目标编码字节宽度）。
 func RenderLine(layout *CachedLayout, msg proto.Message) ([]byte, error) {
 	ref := msg.ProtoReflect()
 	if layout.desc != ref.Descriptor() {
@@ -33,14 +34,18 @@ func RenderLine(layout *CachedLayout, msg proto.Message) ([]byte, error) {
 		if text == "" {
 			continue // 空值/零值字符串：位置保持 fill
 		}
-		padded := padValue(text, cf.Length, cf.PadMode, cf.Fill)
+		b, err := layout.encoder.Bytes([]byte(text))
+		if err != nil {
+			return nil, fmt.Errorf("field %q: encode: %w", cf.FieldName, err)
+		}
+		padded := padBytes(b, cf.Length, cf.PadMode, cf.Fill)
 		copy(line[cf.Offset:cf.Offset+cf.Length], padded)
 	}
 	return line, nil
 }
 
 // RenderDelimitedLine 分隔符：输出 index 1..maxIndex 全列（无字段列空占位），
-// 按 index 升序 join；零值/skip → 空列（D11/D12）。
+// 按 index 升序 join（UTF-8）；零值/skip → 空列（D11/D12）；整行编码输出。
 func RenderDelimitedLine(layout *CachedLayout, msg proto.Message) ([]byte, error) {
 	ref := msg.ProtoReflect()
 	if layout.desc != ref.Descriptor() {
@@ -74,7 +79,8 @@ func RenderDelimitedLine(layout *CachedLayout, msg proto.Message) ([]byte, error
 		}
 		cols = append(cols, text)
 	}
-	return []byte(strings.Join(cols, layout.Delimiter())), nil
+	out := []byte(strings.Join(cols, layout.Delimiter()))
+	return layout.encoder.Bytes(out)
 }
 
 // fieldText 取字段渲染文本（DECIMAL 规范化字符串原样返回，逆转换在调用方按模式处理）。
@@ -93,26 +99,27 @@ func fieldText(ref protoreflect.Message, cf CachedField) string {
 	}
 }
 
-// padValue 补位到 length（超长截断；PAD_LEFT 时符号前置后补 fill）。
-func padValue(v string, length int32, padMode phys.PadMode, fill string) []byte {
-	if fill == "" {
-		fill = " "
+// padBytes 补位到 length（编码后字节，超长截断；PAD_LEFT 时符号前置后补 fill）。
+func padBytes(v []byte, length int32, padMode phys.PadMode, fill string) []byte {
+	fillByte := byte(' ')
+	if fill != "" {
+		fillByte = fill[0]
 	}
 	if int32(len(v)) > length {
-		v = v[:length] // 超长截断（B4）
+		v = v[:length] // 编码后字节截断（B4）
 	}
 	for int32(len(v)) < length {
 		switch padMode {
 		case phys.PadMode_PAD_LEFT:
-			// 符号保持前置："-123" + fill "0" → "-000123"
+			// 符号保持前置："-123" + fill '0' → "-000123"
 			if len(v) > 0 && (v[0] == '-' || v[0] == '+') {
-				v = v[:1] + fill + v[1:]
+				v = append(append([]byte{v[0]}, fillByte), v[1:]...)
 			} else {
-				v = fill + v
+				v = append([]byte{fillByte}, v...)
 			}
 		default: // PAD_RIGHT / 缺省
-			v += fill
+			v = append(v, fillByte)
 		}
 	}
-	return []byte(v)
+	return v
 }
