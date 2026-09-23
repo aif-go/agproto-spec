@@ -86,6 +86,7 @@ func (l *CachedLayout) WithEncoding(name string) (*CachedLayout, error) {
 	c.encoder = e.NewEncoder()
 	return &c, nil
 }
+
 // Fields 返回字段副本（只读语义：外部修改不影响布局）。
 func (l *CachedLayout) Fields() []CachedField {
 	out := make([]CachedField, len(l.fields))
