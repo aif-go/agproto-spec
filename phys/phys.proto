@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package phys;
 
@@ -10,8 +10,8 @@ import "google/protobuf/descriptor.proto";
 
 enum PadMode {
     PAD_UNSPECIFIED = 0;
-    PAD_LEFT  = 1;
-    PAD_RIGHT = 2;
+    PAD_LEFT        = 1;
+    PAD_RIGHT       = 2;
 }
 
 enum SourceFormat {
@@ -20,37 +20,58 @@ enum SourceFormat {
     FORMAT_DELIMITED   = 2;
 }
 
-// ── 字段级: 一个嵌套 message 替代扁平的多个独立 option ──
+// 字段类型语义声明（缺省 TYPE_UNSPECIFIED = 跟随 proto 字段类型）
+enum FieldType {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_STRING      = 1;
+    TYPE_DECIMAL     = 2;   // 必须带 precision
+    TYPE_DATE        = 3;   // 必须带 date_pattern
+    // 预留扩展（proto3 枚举可追加）
+}
+
+// DECIMAL 存储模式（缺省 SCALED）
+enum DecimalMode {
+    DECIMAL_MODE_UNSPECIFIED = 0;   // 缺省 = SCALED
+    DECIMAL_MODE_SCALED      = 1;   // 整数缩放："12345" + precision 2 → 123.45
+    DECIMAL_MODE_EXPLICIT    = 2;   // 显式小数点："123.45" → 123.45
+}
+
+// DATE 格式（预定义枚举，宽度 = 字符数）
+enum DatePattern {
+    DATE_PATTERN_UNSPECIFIED    = 0;
+    DATE_PATTERN_YYYYMMDD       = 1;   // 8 位
+    DATE_PATTERN_HHMMSS         = 2;   // 6 位
+    DATE_PATTERN_YYYYMMDDHHMMSS = 3;   // 14 位
+    // 预留扩展（毫秒等银行变体）
+}
+
+// ── 字段级布局注解 ──
 
 message FieldLayout {
-    optional int32   offset    = 1;
-    optional int32   length    = 2;
-    optional PadMode pad       = 3;
-    optional string  fill      = 4;
-    optional string  format    = 5;
-    optional int32   precision = 6;
-    optional string  target    = 7;
-    optional bool    skip      = 8;
-    optional int32   index     = 9;
+    optional int32       offset       = 1;  // 可选覆盖：字节偏移（高级场景，跳过冗余区域）；缺省按 index 推算
+    optional int32       length       = 2;  // 定长：字节宽度（index 定位时必填）
+    optional PadMode     pad          = 3;  // 对齐模式（缺省 PAD_UNSPECIFIED）
+    optional string      fill         = 4;  // 填充字符（缺省空格）
+    // field 5 已删除（原 format 死字段，字段号不再复用）
+    optional int32       precision    = 6;  // TYPE_DECIMAL：小数位 scale
+    optional string      target       = 7;  // Map：目标字段名
+    optional bool        skip         = 8;  // Map：跳过（不进映射）
+    optional int32       index        = 9;  // 字段序号：定长=第几段 / 分隔符=第几列（1-based，缺省=声明顺序）
+    optional FieldType   type         = 10; // 类型语义声明（缺省跟随 proto 字段类型）
+    optional DecimalMode decimal_mode = 11; // TYPE_DECIMAL：存储模式（缺省 SCALED）
+    optional DatePattern date_pattern = 12; // TYPE_DATE：日期格式枚举
+    // 预留：13+（enum_style 等，等真实需求）
 }
 
-// ── 消息级: 源文件属性 ──
+// ── 消息级文件格式注解（SourceConfig + OutputConfig 合并，2026-09 定稿）──
 
-message SourceConfig {
-    optional SourceFormat format         = 1;
-    optional string       delimiter      = 2;
-    optional int32        skip_header    = 3;
-    optional int32        skip_trailer   = 4;
-    optional string       file_encoding  = 5;
-    optional string       line_separator = 6;
-}
-
-// ── 消息级: 输出文件属性 ──
-
-message OutputConfig {
-    optional bool   header   = 1;
-    optional bool   trailer  = 2;
-    optional string encoding = 3;
+message FileFormat {
+    optional SourceFormat format         = 1;  // FIXED / DELIMITED
+    optional string       delimiter      = 2;  // 分隔符格式的分隔符
+    optional int32        header_lines   = 3;  // 跳过表头行数
+    optional int32        trailer_lines  = 4;  // 跳过表尾行数
+    optional string       encoding       = 5;  // 文件编码（如 "GBK"/"UTF-8"）
+    optional string       line_separator = 6;  // 行分隔符（缺省 \n）
 }
 
 // ── 注册到 proto options ──
@@ -60,6 +81,5 @@ extend google.protobuf.FieldOptions {
 }
 
 extend google.protobuf.MessageOptions {
-    optional SourceConfig source = 50001;
-    optional OutputConfig output = 50002;
+    optional FileFormat file = 50001;
 }

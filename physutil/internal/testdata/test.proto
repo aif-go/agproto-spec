@@ -1,0 +1,198 @@
+syntax = "proto3";
+
+package physutil.testdata;
+
+option go_package = "github.com/aif-go/agproto-spec/physutil/internal/testdata";
+
+import "phys/phys.proto";
+
+// ── 合法消息（解析/渲染/校验基准）──
+
+message ValidFixed {
+    optional string name  = 1 [(phys.layout) = {index: 1, length: 10}];
+    optional string card  = 2 [(phys.layout) = {index: 2, length: 19, pad: PAD_LEFT, fill: "0"}];
+    optional int64  age   = 3 [(phys.layout) = {index: 3, length: 4, pad: PAD_LEFT, fill: "0"}];
+    optional string amt   = 4 [(phys.layout) = {index: 4, length: 15, pad: PAD_LEFT, fill: "0", type: TYPE_DECIMAL, precision: 2}];
+    optional string rate  = 5 [(phys.layout) = {index: 5, length: 8, pad: PAD_LEFT, fill: "0", type: TYPE_DECIMAL, precision: 6}];
+    optional string bizDt = 6 [(phys.layout) = {index: 6, length: 8, type: TYPE_DATE, date_pattern: DATE_PATTERN_YYYYMMDD}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message ValidFixedOffset {   // 显式 offset 覆盖（冗余区）
+    optional string a = 1 [(phys.layout) = {index: 1, length: 10}];
+    optional string b = 2 [(phys.layout) = {index: 2, offset: 100, length: 10}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message ValidDelimited {
+    optional string a   = 1 [(phys.layout) = {index: 1}];
+    optional string b   = 2 [(phys.layout) = {index: 3}];
+    optional int64  c   = 3 [(phys.layout) = {index: 4}];
+    optional string amt = 4 [(phys.layout) = {index: 5, type: TYPE_DECIMAL, precision: 2}];
+    option (phys.file) = {format: FORMAT_DELIMITED, delimiter: "|"};
+}
+
+// ── 校验非法消息（每条触发一条规则）──
+
+message Overlap {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 10}];
+    optional string b = 2 [(phys.layout) = {index: 2, offset: 5, length: 5}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message DupIndex {
+    optional string a = 1 [(phys.layout) = {index: 2, length: 5}];
+    optional string b = 2 [(phys.layout) = {index: 2, length: 5}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message NoLength {
+    optional string a = 1 [(phys.layout) = {index: 1}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message DelimitedWithOffset {
+    optional string a = 1 [(phys.layout) = {index: 1, offset: 0, length: 5}];
+    option (phys.file) = {format: FORMAT_DELIMITED, delimiter: "|"};
+}
+
+message DecimalNoPrecision {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 10, type: TYPE_DECIMAL}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message StringWithPrecision {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 10, precision: 2}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message DateNoPattern {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 8, type: TYPE_DATE}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message DateWidthMismatch {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 10, type: TYPE_DATE, date_pattern: DATE_PATTERN_YYYYMMDD}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message BoolField {
+    optional bool a = 1 [(phys.layout) = {index: 1, length: 1}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message IntTypeMismatch {
+    optional int64 a = 1 [(phys.layout) = {index: 1, length: 4, type: TYPE_DECIMAL}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message ZeroLength {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 0}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message ZeroIndex {
+    optional string a = 1 [(phys.layout) = {index: 0, length: 5}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message NegativeOffset {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 5}];
+    optional string b = 2 [(phys.layout) = {index: 2, offset: -1, length: 5}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message ExplicitDecimal {
+    optional string amt = 1 [(phys.layout) = {index: 1, length: 8, pad: PAD_LEFT, fill: "0", type: TYPE_DECIMAL, precision: 2, decimal_mode: DECIMAL_MODE_EXPLICIT}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+// ── delimiter 边界 ──
+
+message DecimalOnly {
+    optional string amt = 1 [(phys.layout) = {index: 1, length: 15, pad: PAD_LEFT, fill: "0", type: TYPE_DECIMAL, precision: 2}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message DecimalExplicitOnly {
+    optional string amt = 1 [(phys.layout) = {index: 1, length: 8, pad: PAD_LEFT, fill: "0", type: TYPE_DECIMAL, precision: 2, decimal_mode: DECIMAL_MODE_EXPLICIT}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message ValidDelimitedTab {
+    optional string a = 1 [(phys.layout) = {index: 1}];
+    optional string b = 2 [(phys.layout) = {index: 2}];
+    option (phys.file) = {format: FORMAT_DELIMITED, delimiter: "\t"};
+}
+
+message ValidDelimitedMulti {
+    optional string a = 1 [(phys.layout) = {index: 1}];
+    optional string b = 2 [(phys.layout) = {index: 2}];
+    option (phys.file) = {format: FORMAT_DELIMITED, delimiter: "||"};
+}
+
+message ValidFixedSkip {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 5}];
+    optional string b = 2 [(phys.layout) = {index: 2, length: 5, skip: true}];
+    optional string c = 3 [(phys.layout) = {index: 3, length: 5}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message EmptyDelimiter {
+    optional string a = 1 [(phys.layout) = {index: 1}];
+    option (phys.file) = {format: FORMAT_DELIMITED};
+}
+
+// enum kind 构建期拒绝
+enum TestKind {
+    TEST_KIND_ZERO = 0;
+    TEST_KIND_ONE  = 1;
+}
+
+message EnumField {
+    optional TestKind k = 1 [(phys.layout) = {index: 1, length: 2}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message Int32Field {
+    optional int32 n = 1 [(phys.layout) = {index: 1, length: 5, pad: PAD_LEFT, fill: "0"}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+// 裸 scalar（非 optional）：无 presence，值类型字段
+message BareField {
+    string a = 1 [(phys.layout) = {index: 1, length: 5}];
+    int64  b = 2 [(phys.layout) = {index: 2, length: 4, pad: PAD_LEFT, fill: "0"}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+// ── 映射（target/skip）──
+
+message MapSrc {
+    optional string code = 1 [(phys.layout) = {index: 1, length: 5, target: "code"}];
+    optional string amt  = 2 [(phys.layout) = {index: 2, length: 15, pad: PAD_LEFT, fill: "0", type: TYPE_DECIMAL, precision: 2, target: "amt"}];
+    optional string junk = 3 [(phys.layout) = {index: 3, length: 5, skip: true}];
+    optional int64  qty  = 4 [(phys.layout) = {index: 4, length: 4, pad: PAD_LEFT, fill: "0", target: "qty"}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message MapDst {
+    optional string code = 1 [(phys.layout) = {index: 1, length: 5}];
+    optional string amt  = 2 [(phys.layout) = {index: 2, length: 15, pad: PAD_LEFT, fill: "0", type: TYPE_DECIMAL, precision: 2}];
+    optional string qty  = 3 [(phys.layout) = {index: 3, length: 4, pad: PAD_LEFT, fill: "0"}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message MapDstScale4 {
+    optional string code = 2 [(phys.layout) = {index: 2, length: 5}];
+    optional string amt  = 1 [(phys.layout) = {index: 1, length: 18, pad: PAD_LEFT, fill: "0", type: TYPE_DECIMAL, precision: 4}];
+    optional string qty  = 3 [(phys.layout) = {index: 3, length: 4, pad: PAD_LEFT, fill: "0"}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message MapDstLossy {
+    optional string code = 2 [(phys.layout) = {index: 2, length: 5}];
+    optional string amt  = 1 [(phys.layout) = {index: 1, length: 14, pad: PAD_LEFT, fill: "0", type: TYPE_DECIMAL, precision: 1}];
+    optional string qty  = 3 [(phys.layout) = {index: 3, length: 4, pad: PAD_LEFT, fill: "0"}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
