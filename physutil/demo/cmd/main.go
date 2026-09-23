@@ -1,7 +1,8 @@
 // agproto-spec 完整功能演示：银行批量激活文件（GBK 定长）→ B2O 标准接口（UTF-8 分隔符）。
 //
 // 覆盖：注解定义 / 布局构建+校验 / 定长 GBK 字段级解码 / DECIMAL 规范化 /
-//       DATE 透传 / Map（target 重排 + skip 丢弃）/ 分隔符 Render / 有值模型。
+//
+//	DATE 透传 / Map（target 重排 + skip 丢弃）/ 分隔符 Render / 有值模型。
 //
 // 运行：go run ./demo
 package main
@@ -11,8 +12,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aif-go/agproto-spec/demo"
 	"github.com/aif-go/agproto-spec/physutil"
+	"github.com/aif-go/agproto-spec/physutil/demo"
 )
 
 func main() {
@@ -24,12 +25,12 @@ func main() {
 
 	// ── 2. 源文件行（GBK 定长）：卡号19(PAD_LEFT fill 0) + 姓名20(GBK"张三") + 金额15 + 日期8 + 冗余5 ──
 	// "张三" GBK = D5C5 C8FD（4 字节），补 16 空格到 20
-	srcLine := gbkBytes("0006228480012345678")     // 卡号 19 字节（左补 0）
-	srcLine = append(srcLine, gbkBytes("张三")...)  // 姓名
+	srcLine := gbkBytes("0006228480012345678")                  // 卡号 19 字节（左补 0）
+	srcLine = append(srcLine, gbkBytes("张三")...)                // 姓名
 	srcLine = append(srcLine, bytes.Repeat([]byte{' '}, 16)...) // 姓名补位空格
-	srcLine = append(srcLine, []byte("000000000012345")...)    // 金额 SCALED p2 → 123.45
-	srcLine = append(srcLine, []byte("20260918")...)           // 日期
-	srcLine = append(srcLine, []byte("XXXXX")...)              // 冗余区（skip）
+	srcLine = append(srcLine, []byte("000000000012345")...)     // 金额 SCALED p2 → 123.45
+	srcLine = append(srcLine, []byte("20260918")...)            // 日期
+	srcLine = append(srcLine, []byte("XXXXX")...)               // 冗余区（skip）
 	fmt.Printf("[2] 源行 %d 字节（GBK 编码，hex=%x...）\n", len(srcLine), srcLine[:10])
 
 	// ── 3. 解析：定长 + GBK 字段级解码 ──

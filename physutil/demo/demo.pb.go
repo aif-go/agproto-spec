@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v7.35.1
-// source: demo/demo.proto
+// source: physutil/demo/demo.proto
 
 package demo
 
@@ -36,7 +36,7 @@ type DemoSource struct {
 
 func (x *DemoSource) Reset() {
 	*x = DemoSource{}
-	mi := &file_demo_demo_proto_msgTypes[0]
+	mi := &file_physutil_demo_demo_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -48,7 +48,7 @@ func (x *DemoSource) String() string {
 func (*DemoSource) ProtoMessage() {}
 
 func (x *DemoSource) ProtoReflect() protoreflect.Message {
-	mi := &file_demo_demo_proto_msgTypes[0]
+	mi := &file_physutil_demo_demo_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,7 +61,7 @@ func (x *DemoSource) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DemoSource.ProtoReflect.Descriptor instead.
 func (*DemoSource) Descriptor() ([]byte, []int) {
-	return file_demo_demo_proto_rawDescGZIP(), []int{0}
+	return file_physutil_demo_demo_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *DemoSource) GetCardNo() string {
@@ -112,7 +112,7 @@ type DemoStandard struct {
 
 func (x *DemoStandard) Reset() {
 	*x = DemoStandard{}
-	mi := &file_demo_demo_proto_msgTypes[1]
+	mi := &file_physutil_demo_demo_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -124,7 +124,7 @@ func (x *DemoStandard) String() string {
 func (*DemoStandard) ProtoMessage() {}
 
 func (x *DemoStandard) ProtoReflect() protoreflect.Message {
-	mi := &file_demo_demo_proto_msgTypes[1]
+	mi := &file_physutil_demo_demo_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -137,7 +137,7 @@ func (x *DemoStandard) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DemoStandard.ProtoReflect.Descriptor instead.
 func (*DemoStandard) Descriptor() ([]byte, []int) {
-	return file_demo_demo_proto_rawDescGZIP(), []int{1}
+	return file_physutil_demo_demo_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *DemoStandard) GetCardNo() string {
@@ -168,11 +168,11 @@ func (x *DemoStandard) GetBizDate() string {
 	return ""
 }
 
-var File_demo_demo_proto protoreflect.FileDescriptor
+var File_physutil_demo_demo_proto protoreflect.FileDescriptor
 
-const file_demo_demo_proto_rawDesc = "" +
+const file_physutil_demo_demo_proto_rawDesc = "" +
 	"\n" +
-	"\x0fdemo/demo.proto\x12\x04demo\x1a\x0fphys/phys.proto\"\xd0\x02\n" +
+	"\x18physutil/demo/demo.proto\x12\x04demo\x1a\x0fphys/phys.proto\"\xd0\x02\n" +
 	"\n" +
 	"DemoSource\x122\n" +
 	"\x06cardNo\x18\x01 \x01(\tB\x15\x8a\xb5\x18\x11\x10\x13\x18\x01\"\x010:\x06cardNoH\x01H\x00R\x06cardNo\x88\x01\x01\x123\n" +
@@ -197,26 +197,26 @@ const file_demo_demo_proto_rawDesc = "" +
 	"\t_custNameB\x06\n" +
 	"\x04_amtB\n" +
 	"\n" +
-	"\b_bizDateB%Z#github.com/aif-go/agproto-spec/demob\x06proto3"
+	"\b_bizDateB.Z,github.com/aif-go/agproto-spec/physutil/demob\x06proto3"
 
 var (
-	file_demo_demo_proto_rawDescOnce sync.Once
-	file_demo_demo_proto_rawDescData []byte
+	file_physutil_demo_demo_proto_rawDescOnce sync.Once
+	file_physutil_demo_demo_proto_rawDescData []byte
 )
 
-func file_demo_demo_proto_rawDescGZIP() []byte {
-	file_demo_demo_proto_rawDescOnce.Do(func() {
-		file_demo_demo_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_demo_demo_proto_rawDesc), len(file_demo_demo_proto_rawDesc)))
+func file_physutil_demo_demo_proto_rawDescGZIP() []byte {
+	file_physutil_demo_demo_proto_rawDescOnce.Do(func() {
+		file_physutil_demo_demo_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_physutil_demo_demo_proto_rawDesc), len(file_physutil_demo_demo_proto_rawDesc)))
 	})
-	return file_demo_demo_proto_rawDescData
+	return file_physutil_demo_demo_proto_rawDescData
 }
 
-var file_demo_demo_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_demo_demo_proto_goTypes = []any{
+var file_physutil_demo_demo_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_physutil_demo_demo_proto_goTypes = []any{
 	(*DemoSource)(nil),   // 0: demo.DemoSource
 	(*DemoStandard)(nil), // 1: demo.DemoStandard
 }
-var file_demo_demo_proto_depIdxs = []int32{
+var file_physutil_demo_demo_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -224,28 +224,28 @@ var file_demo_demo_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_demo_demo_proto_init() }
-func file_demo_demo_proto_init() {
-	if File_demo_demo_proto != nil {
+func init() { file_physutil_demo_demo_proto_init() }
+func file_physutil_demo_demo_proto_init() {
+	if File_physutil_demo_demo_proto != nil {
 		return
 	}
-	file_demo_demo_proto_msgTypes[0].OneofWrappers = []any{}
-	file_demo_demo_proto_msgTypes[1].OneofWrappers = []any{}
+	file_physutil_demo_demo_proto_msgTypes[0].OneofWrappers = []any{}
+	file_physutil_demo_demo_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_demo_demo_proto_rawDesc), len(file_demo_demo_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_physutil_demo_demo_proto_rawDesc), len(file_physutil_demo_demo_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_demo_demo_proto_goTypes,
-		DependencyIndexes: file_demo_demo_proto_depIdxs,
-		MessageInfos:      file_demo_demo_proto_msgTypes,
+		GoTypes:           file_physutil_demo_demo_proto_goTypes,
+		DependencyIndexes: file_physutil_demo_demo_proto_depIdxs,
+		MessageInfos:      file_physutil_demo_demo_proto_msgTypes,
 	}.Build()
-	File_demo_demo_proto = out.File
-	file_demo_demo_proto_goTypes = nil
-	file_demo_demo_proto_depIdxs = nil
+	File_physutil_demo_demo_proto = out.File
+	file_physutil_demo_demo_proto_goTypes = nil
+	file_physutil_demo_demo_proto_depIdxs = nil
 }

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package demo;
 
-option go_package = "github.com/aif-go/agproto-spec/demo";
+option go_package = "github.com/aif-go/agproto-spec/physutil/demo";
 
 import "phys/phys.proto";
 
