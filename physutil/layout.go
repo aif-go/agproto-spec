@@ -41,11 +41,11 @@ type CachedLayout struct {
 	headerLines   int32 // FileFormat.header_lines（消费方跳过表头用）
 	trailerLines  int32 // FileFormat.trailer_lines（消费方跳过表尾用）
 	lineSeparator string
-	decoder   *encoding.Decoder // 缓存单例（x/text 无状态，并发安全已验证）
-	encoder   *encoding.Encoder
-	fields    []CachedField
-	byName    map[string]int
-	byIndex   map[int32]int
+	decoder       *encoding.Decoder // 缓存单例（x/text 无状态，并发安全已验证）
+	encoder       *encoding.Encoder
+	fields        []CachedField
+	byName        map[string]int
+	byIndex       map[int32]int
 }
 
 func (l *CachedLayout) Format() phys.SourceFormat { return l.format }
@@ -61,9 +61,9 @@ const (
 
 // Decoder 返回布局缓存的解码器（编码校验等场景用；只读共享，无状态安全）。
 func (l *CachedLayout) Decoder() *encoding.Decoder { return l.decoder }
-func (l *CachedLayout) HeaderLines() int32        { return l.headerLines }
-func (l *CachedLayout) TrailerLines() int32       { return l.trailerLines }
-func (l *CachedLayout) LineSeparator() string     { return l.lineSeparator }
+func (l *CachedLayout) HeaderLines() int32         { return l.headerLines }
+func (l *CachedLayout) TrailerLines() int32        { return l.trailerLines }
+func (l *CachedLayout) LineSeparator() string      { return l.lineSeparator }
 
 // WithEncoding 返回克隆布局并覆盖编码（消费方 CLI/config 覆盖 proto 声明的场景）。
 // 重新查注册表构建 decoder/encoder；编码未知 → error。原布局不变（不可变）。
@@ -81,7 +81,7 @@ func (l *CachedLayout) WithEncoding(name string) (*CachedLayout, error) {
 	c.encoder = e.NewEncoder()
 	return &c, nil
 }
-func (l *CachedLayout) Fields() []CachedField     { return l.fields }
+func (l *CachedLayout) Fields() []CachedField { return l.fields }
 func (l *CachedLayout) Field(name string) (CachedField, bool) {
 	i, ok := l.byName[name]
 	if !ok {
