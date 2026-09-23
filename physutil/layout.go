@@ -50,7 +50,7 @@ type CachedLayout struct {
 }
 
 func (l *CachedLayout) Format() phys.SourceFormat { return l.format }
-func (l *CachedLayout) FormatSet() bool            { return l.formatSet }
+func (l *CachedLayout) FormatSet() bool           { return l.formatSet }
 func (l *CachedLayout) Delimiter() string         { return l.delimiter }
 func (l *CachedLayout) Encoding() string          { return l.encoding }
 
@@ -259,7 +259,6 @@ func getLayoutSafe(fd protoreflect.FieldDescriptor) *phys.FieldLayout {
 	}
 	return nil
 }
-
 
 func buildField(fd protoreflect.FieldDescriptor, lf *phys.FieldLayout, format phys.SourceFormat) (CachedField, error) {
 	cf := CachedField{
