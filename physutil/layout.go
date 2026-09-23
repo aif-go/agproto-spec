@@ -36,6 +36,7 @@ type CachedField struct {
 type CachedLayout struct {
 	desc          protoreflect.MessageDescriptor
 	format        phys.SourceFormat
+	formatSet     bool // 消息级是否显式声明 format（区分缺省 vs 未声明）
 	delimiter     string
 	encoding      string
 	headerLines   int32 // FileFormat.header_lines（消费方跳过表头用）
@@ -49,6 +50,7 @@ type CachedLayout struct {
 }
 
 func (l *CachedLayout) Format() phys.SourceFormat { return l.format }
+func (l *CachedLayout) FormatSet() bool            { return l.formatSet }
 func (l *CachedLayout) Delimiter() string         { return l.delimiter }
 func (l *CachedLayout) Encoding() string          { return l.encoding }
 
@@ -111,22 +113,14 @@ func dateWidth(p phys.DatePattern) (int32, bool) {
 	}
 }
 
-// getFileFormatSafe 安全读取消息级 FileFormat 扩展：
-// 预编译场景（pb.go）直取；protocompile 动态编译场景（扩展为 dynamicpb.Message）
-// 先 marshal 再 unmarshal 到 descriptorpb.MessageOptions 后读取，保证两场景兼容。
+// getFileFormatSafe 安全读取消息级 FileFormat 扩展。
+// 统一走 marshal → unmarshal 到 descriptorpb.MessageOptions 后读取：
+// 兼容预编译（pb.go）与 protocompile 动态编译（opts 为 dynamicpb.Message，直取会 panic）两场景。
 func getFileFormatSafe(desc protoreflect.MessageDescriptor) (*phys.FileFormat, bool) {
 	opts := desc.Options()
 	if opts == nil {
 		return nil, false
 	}
-	if proto.HasExtension(opts, phys.E_File) {
-		if ext := proto.GetExtension(opts, phys.E_File); ext != nil {
-			if ff, ok := ext.(*phys.FileFormat); ok {
-				return ff, true
-			}
-		}
-	}
-	// dynamicpb 路径：marshal → unmarshal
 	b, err := proto.Marshal(opts)
 	if err != nil {
 		return nil, false
@@ -163,6 +157,7 @@ func BuildCachedLayout(desc protoreflect.MessageDescriptor) (*CachedLayout, erro
 	if ff, ok := getFileFormatSafe(desc); ok {
 		if ff.GetFormat() != phys.SourceFormat_FORMAT_UNSPECIFIED {
 			layout.format = ff.GetFormat()
+			layout.formatSet = true
 		}
 		layout.delimiter = ff.GetDelimiter()
 		layout.headerLines = ff.GetHeaderLines()
@@ -244,14 +239,6 @@ func BuildCachedLayout(desc protoreflect.MessageDescriptor) (*CachedLayout, erro
 
 func getLayoutSafe(fd protoreflect.FieldDescriptor) *phys.FieldLayout {
 	opts := fd.Options()
-	if opts != nil && proto.HasExtension(opts, phys.E_Layout) {
-		if ext := proto.GetExtension(opts, phys.E_Layout); ext != nil {
-			if lf, ok := ext.(*phys.FieldLayout); ok {
-				return lf
-			}
-		}
-	}
-	// dynamicpb 路径：marshal → unmarshal
 	if opts == nil {
 		return nil
 	}
@@ -273,7 +260,7 @@ func getLayoutSafe(fd protoreflect.FieldDescriptor) *phys.FieldLayout {
 	return nil
 }
 
-// buildField 单字段校验 + 构建（§3.5 规则 1-6、9-11）
+
 func buildField(fd protoreflect.FieldDescriptor, lf *phys.FieldLayout, format phys.SourceFormat) (CachedField, error) {
 	cf := CachedField{
 		Offset:       -1, // 哨兵：未显式设置（构建时推算）

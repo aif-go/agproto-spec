@@ -28,11 +28,17 @@ func RenderLine(layout *CachedLayout, msg proto.Message) ([]byte, error) {
 	line := []byte(strings.Repeat(" ", int(lineLen)))
 	for _, cf := range layout.Fields() {
 		if cf.Skip {
-			continue // 位置保持 fill
+			continue // skip 字段：位置保持空白（不参与输出）
 		}
 		text := fieldText(ref, cf)
 		if text == "" {
-			continue // 空值/零值字符串：位置保持 fill
+			// 空值/零值：位置用 fill 占位（fill 缺省空格；PAD_LEFT+fill="0" → 全 0）
+			if fillByte := fillOf(cf); fillByte != ' ' {
+				for i := cf.Offset; i < cf.Offset+cf.Length; i++ {
+					line[i] = fillByte
+				}
+			}
+			continue
 		}
 		b, err := layout.encoder.Bytes([]byte(text))
 		if err != nil {
@@ -42,6 +48,14 @@ func RenderLine(layout *CachedLayout, msg proto.Message) ([]byte, error) {
 		copy(line[cf.Offset:cf.Offset+cf.Length], padded)
 	}
 	return line, nil
+}
+
+// fillOf 返回字段的填充字符（缺省空格）。
+func fillOf(cf CachedField) byte {
+	if cf.Fill == "" {
+		return ' '
+	}
+	return cf.Fill[0]
 }
 
 // RenderDelimitedLine 分隔符：输出 index 1..maxIndex 全列（无字段列空占位），

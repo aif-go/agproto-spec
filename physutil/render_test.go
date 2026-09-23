@@ -75,12 +75,13 @@ func TestRenderLine_BlankToFill(t *testing.T) {
 	m := (&testdata.ValidFixed{}).ProtoReflect().New().Interface()
 	setStr(m, "name", "ABC")
 	// 其余字段零值/空白
+	// 新语义（fill 占位）：card/age/amt/rate 空值 → fill "0" 填满；bizDt 无 fill → 空格
 	want := "ABC       " + // name
-		"                   " + // card 空 → 空格 fill
+		"0000000000000000000" + // card 空 → fill 0 填满 19
 		"0000" + // age 0 → PAD_LEFT 0 → "0000"
-		"               " + // amt 空 → 空格
-		"        " + // rate 空
-		"        " // bizDt 空
+		"000000000000000" + // amt 空 → fill 0 填满 15
+		"00000000" + // rate 空 → fill 0 填满 8
+		"        " // bizDt 空 → 无 fill 空格
 	got := string(renderMsg(t, m))
 	if got != want {
 		t.Errorf("render:\n got %q\nwant %q", got, want)
