@@ -9,6 +9,7 @@ import (
 	"golang.org/x/text/encoding"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 
 	"github.com/aif-go/agproto-spec/phys"
 )
@@ -33,10 +34,13 @@ type CachedField struct {
 
 // CachedLayout 描述一个消息的布局（构建时预计算 + 校验）。
 type CachedLayout struct {
-	desc      protoreflect.MessageDescriptor
-	format    phys.SourceFormat
-	delimiter string
-	encoding  string
+	desc          protoreflect.MessageDescriptor
+	format        phys.SourceFormat
+	delimiter     string
+	encoding      string
+	headerLines   int32 // FileFormat.header_lines（消费方跳过表头用）
+	trailerLines  int32 // FileFormat.trailer_lines（消费方跳过表尾用）
+	lineSeparator string
 	decoder   *encoding.Decoder // 缓存单例（x/text 无状态，并发安全已验证）
 	encoder   *encoding.Encoder
 	fields    []CachedField
@@ -47,6 +51,36 @@ type CachedLayout struct {
 func (l *CachedLayout) Format() phys.SourceFormat { return l.format }
 func (l *CachedLayout) Delimiter() string         { return l.delimiter }
 func (l *CachedLayout) Encoding() string          { return l.encoding }
+
+// Format 常量别名（消费方比较用）
+const (
+	FormatUnspecified = phys.SourceFormat_FORMAT_UNSPECIFIED
+	FormatFixed       = phys.SourceFormat_FORMAT_FIXED
+	FormatDelimited   = phys.SourceFormat_FORMAT_DELIMITED
+)
+
+// Decoder 返回布局缓存的解码器（编码校验等场景用；只读共享，无状态安全）。
+func (l *CachedLayout) Decoder() *encoding.Decoder { return l.decoder }
+func (l *CachedLayout) HeaderLines() int32        { return l.headerLines }
+func (l *CachedLayout) TrailerLines() int32       { return l.trailerLines }
+func (l *CachedLayout) LineSeparator() string     { return l.lineSeparator }
+
+// WithEncoding 返回克隆布局并覆盖编码（消费方 CLI/config 覆盖 proto 声明的场景）。
+// 重新查注册表构建 decoder/encoder；编码未知 → error。原布局不变（不可变）。
+func (l *CachedLayout) WithEncoding(name string) (*CachedLayout, error) {
+	if name == "" || name == l.encoding {
+		return l, nil
+	}
+	e, ok := LookupEncoding(name)
+	if !ok {
+		return nil, fmt.Errorf("unsupported encoding %q (register via RegisterEncoding)", name)
+	}
+	c := *l // 浅拷贝（切片/映射共享，只读）
+	c.encoding = name
+	c.decoder = e.NewDecoder()
+	c.encoder = e.NewEncoder()
+	return &c, nil
+}
 func (l *CachedLayout) Fields() []CachedField     { return l.fields }
 func (l *CachedLayout) Field(name string) (CachedField, bool) {
 	i, ok := l.byName[name]
@@ -77,9 +111,46 @@ func dateWidth(p phys.DatePattern) (int32, bool) {
 	}
 }
 
+// getFileFormatSafe 安全读取消息级 FileFormat 扩展：
+// 预编译场景（pb.go）直取；protocompile 动态编译场景（扩展为 dynamicpb.Message）
+// 先 marshal 再 unmarshal 到 descriptorpb.MessageOptions 后读取，保证两场景兼容。
+func getFileFormatSafe(desc protoreflect.MessageDescriptor) (*phys.FileFormat, bool) {
+	opts := desc.Options()
+	if opts == nil {
+		return nil, false
+	}
+	if proto.HasExtension(opts, phys.E_File) {
+		if ext := proto.GetExtension(opts, phys.E_File); ext != nil {
+			if ff, ok := ext.(*phys.FileFormat); ok {
+				return ff, true
+			}
+		}
+	}
+	// dynamicpb 路径：marshal → unmarshal
+	b, err := proto.Marshal(opts)
+	if err != nil {
+		return nil, false
+	}
+	dOpts := &descriptorpb.MessageOptions{}
+	if err := proto.Unmarshal(b, dOpts); err != nil {
+		return nil, false
+	}
+	if proto.HasExtension(dOpts, phys.E_File) {
+		if ext := proto.GetExtension(dOpts, phys.E_File); ext != nil {
+			if ff, ok := ext.(*phys.FileFormat); ok {
+				return ff, true
+			}
+		}
+	}
+	return nil, false
+}
+
 // BuildCachedLayout 从消息描述符构建布局：读取注解、校验规则（§3.5）、
 // 按 index 排序并推算 offset（定长）、建立字段名索引。
 func BuildCachedLayout(desc protoreflect.MessageDescriptor) (*CachedLayout, error) {
+	if desc == nil {
+		return nil, fmt.Errorf("build layout: nil descriptor")
+	}
 	layout := &CachedLayout{
 		desc:      desc,
 		format:    phys.SourceFormat_FORMAT_FIXED, // 缺省定长
@@ -89,12 +160,14 @@ func BuildCachedLayout(desc protoreflect.MessageDescriptor) (*CachedLayout, erro
 
 	// 编码解析：查注册表（缺省 UTF-8），未知 → 构建报错（fail-fast）
 	enc := "UTF-8"
-	if mdOpts := desc.Options(); mdOpts != nil && proto.HasExtension(mdOpts, phys.E_File) {
-		ff := proto.GetExtension(mdOpts, phys.E_File).(*phys.FileFormat)
+	if ff, ok := getFileFormatSafe(desc); ok {
 		if ff.GetFormat() != phys.SourceFormat_FORMAT_UNSPECIFIED {
 			layout.format = ff.GetFormat()
 		}
 		layout.delimiter = ff.GetDelimiter()
+		layout.headerLines = ff.GetHeaderLines()
+		layout.trailerLines = ff.GetTrailerLines()
+		layout.lineSeparator = ff.GetLineSeparator()
 		if ff.GetEncoding() != "" {
 			enc = ff.GetEncoding()
 		}
@@ -172,7 +245,30 @@ func BuildCachedLayout(desc protoreflect.MessageDescriptor) (*CachedLayout, erro
 func getLayoutSafe(fd protoreflect.FieldDescriptor) *phys.FieldLayout {
 	opts := fd.Options()
 	if opts != nil && proto.HasExtension(opts, phys.E_Layout) {
-		return proto.GetExtension(opts, phys.E_Layout).(*phys.FieldLayout)
+		if ext := proto.GetExtension(opts, phys.E_Layout); ext != nil {
+			if lf, ok := ext.(*phys.FieldLayout); ok {
+				return lf
+			}
+		}
+	}
+	// dynamicpb 路径：marshal → unmarshal
+	if opts == nil {
+		return nil
+	}
+	b, err := proto.Marshal(opts)
+	if err != nil {
+		return nil
+	}
+	dOpts := &descriptorpb.FieldOptions{}
+	if err := proto.Unmarshal(b, dOpts); err != nil {
+		return nil
+	}
+	if proto.HasExtension(dOpts, phys.E_Layout) {
+		if ext := proto.GetExtension(dOpts, phys.E_Layout); ext != nil {
+			if lf, ok := ext.(*phys.FieldLayout); ok {
+				return lf
+			}
+		}
 	}
 	return nil
 }

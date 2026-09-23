@@ -77,6 +77,9 @@ func checkFFFD(dec []byte) error {
 	return nil
 }
 
+// CheckFFFD 导出版（消费方编码校验场景用）。
+func CheckFFFD(dec []byte) error { return checkFFFD(dec) }
+
 // setField 单字段：trim → 空则 Set 零值 → 按 kind/type 转换 Set。
 func setField(ref protoreflect.Message, cf CachedField, raw []byte) error {
 	var val string

@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package physutil.testdata;
+
+option go_package = "github.com/aif-go/agproto-spec/physutil/internal/testdata";
+
+import "phys/phys.proto";
+
+// proto2 业务文件兼容性验证：跨语法使用 proto3 的 phys custom options
+message Proto2Msg {
+    optional string name = 1 [(phys.layout) = {index: 1, length: 10}];
+    optional int64  qty  = 2 [(phys.layout) = {index: 2, length: 15, pad: PAD_LEFT, fill: "0"}];
+    optional string date = 3 [(phys.layout) = {index: 3, length: 8, type: TYPE_DATE, date_pattern: DATE_PATTERN_YYYYMMDD}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
