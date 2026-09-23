@@ -1297,6 +1297,182 @@ func (x *Int32Field) GetN() int32 {
 	return 0
 }
 
+type NoFileOpt struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	A             *string                `protobuf:"bytes,1,opt,name=a,proto3,oneof" json:"a,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NoFileOpt) Reset() {
+	*x = NoFileOpt{}
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NoFileOpt) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NoFileOpt) ProtoMessage() {}
+
+func (x *NoFileOpt) ProtoReflect() protoreflect.Message {
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NoFileOpt.ProtoReflect.Descriptor instead.
+func (*NoFileOpt) Descriptor() ([]byte, []int) {
+	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *NoFileOpt) GetA() string {
+	if x != nil && x.A != nil {
+		return *x.A
+	}
+	return ""
+}
+
+type WithHeader struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	A             *string                `protobuf:"bytes,1,opt,name=a,proto3,oneof" json:"a,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WithHeader) Reset() {
+	*x = WithHeader{}
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WithHeader) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WithHeader) ProtoMessage() {}
+
+func (x *WithHeader) ProtoReflect() protoreflect.Message {
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WithHeader.ProtoReflect.Descriptor instead.
+func (*WithHeader) Descriptor() ([]byte, []int) {
+	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *WithHeader) GetA() string {
+	if x != nil && x.A != nil {
+		return *x.A
+	}
+	return ""
+}
+
+type FillMultiByte struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	A             *string                `protobuf:"bytes,1,opt,name=a,proto3,oneof" json:"a,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FillMultiByte) Reset() {
+	*x = FillMultiByte{}
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FillMultiByte) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FillMultiByte) ProtoMessage() {}
+
+func (x *FillMultiByte) ProtoReflect() protoreflect.Message {
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FillMultiByte.ProtoReflect.Descriptor instead.
+func (*FillMultiByte) Descriptor() ([]byte, []int) {
+	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *FillMultiByte) GetA() string {
+	if x != nil && x.A != nil {
+		return *x.A
+	}
+	return ""
+}
+
+type HugeLength struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	A             *string                `protobuf:"bytes,1,opt,name=a,proto3,oneof" json:"a,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HugeLength) Reset() {
+	*x = HugeLength{}
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HugeLength) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HugeLength) ProtoMessage() {}
+
+func (x *HugeLength) ProtoReflect() protoreflect.Message {
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HugeLength.ProtoReflect.Descriptor instead.
+func (*HugeLength) Descriptor() ([]byte, []int) {
+	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *HugeLength) GetA() string {
+	if x != nil && x.A != nil {
+		return *x.A
+	}
+	return ""
+}
+
 // 裸 scalar（非 optional）：无 presence，值类型字段
 type BareField struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1308,7 +1484,7 @@ type BareField struct {
 
 func (x *BareField) Reset() {
 	*x = BareField{}
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[25]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1320,7 +1496,7 @@ func (x *BareField) String() string {
 func (*BareField) ProtoMessage() {}
 
 func (x *BareField) ProtoReflect() protoreflect.Message {
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[25]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1333,7 +1509,7 @@ func (x *BareField) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BareField.ProtoReflect.Descriptor instead.
 func (*BareField) Descriptor() ([]byte, []int) {
-	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{25}
+	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *BareField) GetA() string {
@@ -1360,7 +1536,7 @@ type EncFixed struct {
 
 func (x *EncFixed) Reset() {
 	*x = EncFixed{}
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[26]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1372,7 +1548,7 @@ func (x *EncFixed) String() string {
 func (*EncFixed) ProtoMessage() {}
 
 func (x *EncFixed) ProtoReflect() protoreflect.Message {
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[26]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1385,7 +1561,7 @@ func (x *EncFixed) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EncFixed.ProtoReflect.Descriptor instead.
 func (*EncFixed) Descriptor() ([]byte, []int) {
-	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{26}
+	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *EncFixed) GetName() string {
@@ -1412,7 +1588,7 @@ type EncDelimited struct {
 
 func (x *EncDelimited) Reset() {
 	*x = EncDelimited{}
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[27]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1424,7 +1600,7 @@ func (x *EncDelimited) String() string {
 func (*EncDelimited) ProtoMessage() {}
 
 func (x *EncDelimited) ProtoReflect() protoreflect.Message {
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[27]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1437,7 +1613,7 @@ func (x *EncDelimited) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EncDelimited.ProtoReflect.Descriptor instead.
 func (*EncDelimited) Descriptor() ([]byte, []int) {
-	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{27}
+	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *EncDelimited) GetName() string {
@@ -1463,7 +1639,7 @@ type EncUnknown struct {
 
 func (x *EncUnknown) Reset() {
 	*x = EncUnknown{}
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[28]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1475,7 +1651,7 @@ func (x *EncUnknown) String() string {
 func (*EncUnknown) ProtoMessage() {}
 
 func (x *EncUnknown) ProtoReflect() protoreflect.Message {
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[28]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1488,7 +1664,7 @@ func (x *EncUnknown) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EncUnknown.ProtoReflect.Descriptor instead.
 func (*EncUnknown) Descriptor() ([]byte, []int) {
-	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{28}
+	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *EncUnknown) GetA() string {
@@ -1510,7 +1686,7 @@ type MapSrc struct {
 
 func (x *MapSrc) Reset() {
 	*x = MapSrc{}
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[29]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1522,7 +1698,7 @@ func (x *MapSrc) String() string {
 func (*MapSrc) ProtoMessage() {}
 
 func (x *MapSrc) ProtoReflect() protoreflect.Message {
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[29]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1535,7 +1711,7 @@ func (x *MapSrc) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MapSrc.ProtoReflect.Descriptor instead.
 func (*MapSrc) Descriptor() ([]byte, []int) {
-	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{29}
+	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *MapSrc) GetCode() string {
@@ -1577,7 +1753,7 @@ type MapDst struct {
 
 func (x *MapDst) Reset() {
 	*x = MapDst{}
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[30]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1589,7 +1765,7 @@ func (x *MapDst) String() string {
 func (*MapDst) ProtoMessage() {}
 
 func (x *MapDst) ProtoReflect() protoreflect.Message {
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[30]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1602,7 +1778,7 @@ func (x *MapDst) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MapDst.ProtoReflect.Descriptor instead.
 func (*MapDst) Descriptor() ([]byte, []int) {
-	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{30}
+	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *MapDst) GetCode() string {
@@ -1637,7 +1813,7 @@ type MapDstScale4 struct {
 
 func (x *MapDstScale4) Reset() {
 	*x = MapDstScale4{}
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[31]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1649,7 +1825,7 @@ func (x *MapDstScale4) String() string {
 func (*MapDstScale4) ProtoMessage() {}
 
 func (x *MapDstScale4) ProtoReflect() protoreflect.Message {
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[31]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1662,7 +1838,7 @@ func (x *MapDstScale4) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MapDstScale4.ProtoReflect.Descriptor instead.
 func (*MapDstScale4) Descriptor() ([]byte, []int) {
-	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{31}
+	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *MapDstScale4) GetCode() string {
@@ -1697,7 +1873,7 @@ type MapDstLossy struct {
 
 func (x *MapDstLossy) Reset() {
 	*x = MapDstLossy{}
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[32]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1709,7 +1885,7 @@ func (x *MapDstLossy) String() string {
 func (*MapDstLossy) ProtoMessage() {}
 
 func (x *MapDstLossy) ProtoReflect() protoreflect.Message {
-	mi := &file_physutil_internal_testdata_test_proto_msgTypes[32]
+	mi := &file_physutil_internal_testdata_test_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1722,7 +1898,7 @@ func (x *MapDstLossy) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MapDstLossy.ProtoReflect.Descriptor instead.
 func (*MapDstLossy) Descriptor() ([]byte, []int) {
-	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{32}
+	return file_physutil_internal_testdata_test_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *MapDstLossy) GetCode() string {
@@ -1877,7 +2053,22 @@ const file_physutil_internal_testdata_test_proto_rawDesc = "" +
 	"\n" +
 	"Int32Field\x12 \n" +
 	"\x01n\x18\x01 \x01(\x05B\r\x8a\xb5\x18\t\x10\x05\x18\x01\"\x010H\x01H\x00R\x01n\x88\x01\x01:\x06\x8a\xb5\x18\x02\b\x01B\x04\n" +
-	"\x02_n\"H\n" +
+	"\x02_n\".\n" +
+	"\tNoFileOpt\x12\x1b\n" +
+	"\x01a\x18\x01 \x01(\tB\b\x8a\xb5\x18\x04\x10\x05H\x01H\x00R\x01a\x88\x01\x01B\x04\n" +
+	"\x02_a\"D\n" +
+	"\n" +
+	"WithHeader\x12\x1b\n" +
+	"\x01a\x18\x01 \x01(\tB\b\x8a\xb5\x18\x04\x10\x05H\x01H\x00R\x01a\x88\x01\x01:\x13\x8a\xb5\x18\x0f\b\x01\x18\x01 \x02*\x03GBK2\x02\r\n" +
+	"B\x04\n" +
+	"\x02_a\">\n" +
+	"\rFillMultiByte\x12\x1f\n" +
+	"\x01a\x18\x01 \x01(\tB\f\x8a\xb5\x18\b\x10\x05\"\x0200H\x01H\x00R\x01a\x88\x01\x01:\x06\x8a\xb5\x18\x02\b\x01B\x04\n" +
+	"\x02_a\";\n" +
+	"\n" +
+	"HugeLength\x12\x1f\n" +
+	"\x01a\x18\x01 \x01(\tB\f\x8a\xb5\x18\b\x10\x80\xa8ֹ\aH\x01H\x00R\x01a\x88\x01\x01:\x06\x8a\xb5\x18\x02\b\x01B\x04\n" +
+	"\x02_a\"H\n" +
 	"\tBareField\x12\x16\n" +
 	"\x01a\x18\x01 \x01(\tB\b\x8a\xb5\x18\x04\x10\x05H\x01R\x01a\x12\x1b\n" +
 	"\x01b\x18\x02 \x01(\x03B\r\x8a\xb5\x18\t\x10\x04\x18\x01\"\x010H\x02R\x01b:\x06\x8a\xb5\x18\x02\b\x01\"t\n" +
@@ -1946,7 +2137,7 @@ func file_physutil_internal_testdata_test_proto_rawDescGZIP() []byte {
 }
 
 var file_physutil_internal_testdata_test_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_physutil_internal_testdata_test_proto_msgTypes = make([]protoimpl.MessageInfo, 33)
+var file_physutil_internal_testdata_test_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
 var file_physutil_internal_testdata_test_proto_goTypes = []any{
 	(TestKind)(0),               // 0: physutil.testdata.TestKind
 	(*ValidFixed)(nil),          // 1: physutil.testdata.ValidFixed
@@ -1974,14 +2165,18 @@ var file_physutil_internal_testdata_test_proto_goTypes = []any{
 	(*EmptyDelimiter)(nil),      // 23: physutil.testdata.EmptyDelimiter
 	(*EnumField)(nil),           // 24: physutil.testdata.EnumField
 	(*Int32Field)(nil),          // 25: physutil.testdata.Int32Field
-	(*BareField)(nil),           // 26: physutil.testdata.BareField
-	(*EncFixed)(nil),            // 27: physutil.testdata.EncFixed
-	(*EncDelimited)(nil),        // 28: physutil.testdata.EncDelimited
-	(*EncUnknown)(nil),          // 29: physutil.testdata.EncUnknown
-	(*MapSrc)(nil),              // 30: physutil.testdata.MapSrc
-	(*MapDst)(nil),              // 31: physutil.testdata.MapDst
-	(*MapDstScale4)(nil),        // 32: physutil.testdata.MapDstScale4
-	(*MapDstLossy)(nil),         // 33: physutil.testdata.MapDstLossy
+	(*NoFileOpt)(nil),           // 26: physutil.testdata.NoFileOpt
+	(*WithHeader)(nil),          // 27: physutil.testdata.WithHeader
+	(*FillMultiByte)(nil),       // 28: physutil.testdata.FillMultiByte
+	(*HugeLength)(nil),          // 29: physutil.testdata.HugeLength
+	(*BareField)(nil),           // 30: physutil.testdata.BareField
+	(*EncFixed)(nil),            // 31: physutil.testdata.EncFixed
+	(*EncDelimited)(nil),        // 32: physutil.testdata.EncDelimited
+	(*EncUnknown)(nil),          // 33: physutil.testdata.EncUnknown
+	(*MapSrc)(nil),              // 34: physutil.testdata.MapSrc
+	(*MapDst)(nil),              // 35: physutil.testdata.MapDst
+	(*MapDstScale4)(nil),        // 36: physutil.testdata.MapDstScale4
+	(*MapDstLossy)(nil),         // 37: physutil.testdata.MapDstLossy
 }
 var file_physutil_internal_testdata_test_proto_depIdxs = []int32{
 	0, // 0: physutil.testdata.EnumField.k:type_name -> physutil.testdata.TestKind
@@ -2022,20 +2217,24 @@ func file_physutil_internal_testdata_test_proto_init() {
 	file_physutil_internal_testdata_test_proto_msgTypes[22].OneofWrappers = []any{}
 	file_physutil_internal_testdata_test_proto_msgTypes[23].OneofWrappers = []any{}
 	file_physutil_internal_testdata_test_proto_msgTypes[24].OneofWrappers = []any{}
+	file_physutil_internal_testdata_test_proto_msgTypes[25].OneofWrappers = []any{}
 	file_physutil_internal_testdata_test_proto_msgTypes[26].OneofWrappers = []any{}
 	file_physutil_internal_testdata_test_proto_msgTypes[27].OneofWrappers = []any{}
 	file_physutil_internal_testdata_test_proto_msgTypes[28].OneofWrappers = []any{}
-	file_physutil_internal_testdata_test_proto_msgTypes[29].OneofWrappers = []any{}
 	file_physutil_internal_testdata_test_proto_msgTypes[30].OneofWrappers = []any{}
 	file_physutil_internal_testdata_test_proto_msgTypes[31].OneofWrappers = []any{}
 	file_physutil_internal_testdata_test_proto_msgTypes[32].OneofWrappers = []any{}
+	file_physutil_internal_testdata_test_proto_msgTypes[33].OneofWrappers = []any{}
+	file_physutil_internal_testdata_test_proto_msgTypes[34].OneofWrappers = []any{}
+	file_physutil_internal_testdata_test_proto_msgTypes[35].OneofWrappers = []any{}
+	file_physutil_internal_testdata_test_proto_msgTypes[36].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_physutil_internal_testdata_test_proto_rawDesc), len(file_physutil_internal_testdata_test_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   33,
+			NumMessages:   37,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

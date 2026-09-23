@@ -159,6 +159,27 @@ message Int32Field {
     option (phys.file) = {format: FORMAT_FIXED};
 }
 
+// ── 审计补充（边界/新 API）──
+
+message NoFileOpt {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 5}];
+}
+
+message WithHeader {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 5}];
+    option (phys.file) = {format: FORMAT_FIXED, encoding: "GBK", header_lines: 1, trailer_lines: 2, line_separator: "\r\n"};
+}
+
+message FillMultiByte {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 5, fill: "00"}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
+message HugeLength {
+    optional string a = 1 [(phys.layout) = {index: 1, length: 2000000000}];
+    option (phys.file) = {format: FORMAT_FIXED};
+}
+
 // 裸 scalar（非 optional）：无 presence，值类型字段
 message BareField {
     string a = 1 [(phys.layout) = {index: 1, length: 5}];

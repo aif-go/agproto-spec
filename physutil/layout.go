@@ -49,6 +49,9 @@ type CachedLayout struct {
 	byIndex       map[int32]int
 }
 
+// maxFieldLength 单字段字节宽度上限（防 int32 溢出 panic；银行行宽远小于此）。
+const maxFieldLength = 1 << 20 // 1MB
+
 func (l *CachedLayout) Format() phys.SourceFormat { return l.format }
 func (l *CachedLayout) FormatSet() bool           { return l.formatSet }
 func (l *CachedLayout) Delimiter() string         { return l.delimiter }
@@ -83,7 +86,12 @@ func (l *CachedLayout) WithEncoding(name string) (*CachedLayout, error) {
 	c.encoder = e.NewEncoder()
 	return &c, nil
 }
-func (l *CachedLayout) Fields() []CachedField { return l.fields }
+// Fields 返回字段副本（只读语义：外部修改不影响布局）。
+func (l *CachedLayout) Fields() []CachedField {
+	out := make([]CachedField, len(l.fields))
+	copy(out, l.fields)
+	return out
+}
 func (l *CachedLayout) Field(name string) (CachedField, bool) {
 	i, ok := l.byName[name]
 	if !ok {
@@ -293,6 +301,11 @@ func buildField(fd protoreflect.FieldDescriptor, lf *phys.FieldLayout, format ph
 		cf.DecimalMode = phys.DecimalMode_DECIMAL_MODE_SCALED
 	}
 
+	// fill 必须单字节（cutset trim/pad 语义；多字节 fill 取首字节会造成混淆）
+	if lf.Fill != nil && len(*lf.Fill) > 1 {
+		return cf, fmt.Errorf("fill must be a single byte, got %q", *lf.Fill)
+	}
+
 	// 规则 6：bool 字段禁止
 	if fd.Kind() == protoreflect.BoolKind {
 		return cf, fmt.Errorf("bool fields are not supported (use string)")
@@ -350,6 +363,13 @@ func buildField(fd protoreflect.FieldDescriptor, lf *phys.FieldLayout, format ph
 	case phys.SourceFormat_FORMAT_FIXED:
 		if cf.Length <= 0 {
 			return cf, fmt.Errorf("fixed format requires length > 0 (got %d)", cf.Length)
+		}
+		if cf.Length > maxFieldLength {
+			return cf, fmt.Errorf("length %d exceeds limit %d", cf.Length, maxFieldLength)
+		}
+		// H1：offset+length 溢出/超限防护（防 slice panic；-1 哨兵=未显式，构建期推算）
+		if cf.Offset >= 0 && cf.Offset > maxFieldLength-cf.Length {
+			return cf, fmt.Errorf("offset %d + length %d exceeds limit %d", cf.Offset, cf.Length, maxFieldLength)
 		}
 		if cf.Index < 0 {
 			return cf, fmt.Errorf("negative index %d", cf.Index)

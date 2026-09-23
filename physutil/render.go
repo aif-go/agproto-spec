@@ -20,13 +20,13 @@ func RenderLine(layout *CachedLayout, msg proto.Message) ([]byte, error) {
 		return nil, fmt.Errorf("layout was built for %q, not %q", layout.desc.FullName(), ref.Descriptor().FullName())
 	}
 	var lineLen int32
-	for _, cf := range layout.Fields() {
+	for _, cf := range layout.fields {
 		if end := cf.Offset + cf.Length; end > lineLen {
 			lineLen = end
 		}
 	}
 	line := []byte(strings.Repeat(" ", int(lineLen)))
-	for _, cf := range layout.Fields() {
+	for _, cf := range layout.fields {
 		if cf.Skip {
 			continue // skip 字段：位置保持空白（不参与输出）
 		}
@@ -66,7 +66,7 @@ func RenderDelimitedLine(layout *CachedLayout, msg proto.Message) ([]byte, error
 		return nil, fmt.Errorf("layout was built for %q, not %q", layout.desc.FullName(), ref.Descriptor().FullName())
 	}
 	var maxIndex int32
-	for _, cf := range layout.Fields() {
+	for _, cf := range layout.fields {
 		if cf.Index > maxIndex {
 			maxIndex = cf.Index
 		}

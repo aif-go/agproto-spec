@@ -21,7 +21,7 @@ func ParseLine(layout *CachedLayout, dest proto.Message, line []byte) error {
 	if layout.desc != ref.Descriptor() {
 		return fmt.Errorf("layout was built for %q, not %q", layout.desc.FullName(), ref.Descriptor().FullName())
 	}
-	for _, cf := range layout.Fields() {
+	for _, cf := range layout.fields {
 		end := cf.Offset + cf.Length
 		if end > int32(len(line)) {
 			return fmt.Errorf("field %q: line too short (%d bytes), need offset %d + length %d = %d",
@@ -57,7 +57,7 @@ func ParseDelimitedLine(layout *CachedLayout, dest proto.Message, line []byte) e
 	if layout.desc != ref.Descriptor() {
 		return fmt.Errorf("layout was built for %q, not %q", layout.desc.FullName(), ref.Descriptor().FullName())
 	}
-	for _, cf := range layout.Fields() {
+	for _, cf := range layout.fields {
 		if int(cf.Index) > len(parts) {
 			return fmt.Errorf("field %q: index %d exceeds column count %d", cf.FieldName, cf.Index, len(parts))
 		}
@@ -153,6 +153,10 @@ func zeroValue(cf CachedField) protoreflect.Value {
 }
 
 // trimByPad 按 pad/fill 修剪填充字符；pad 缺省 = PAD_RIGHT（空格，定长文件最常见）。
+// ⚠️ 已知限制（H2）：fill 是 cutset（字符集合），PAD_LEFT+fill="0" 会去掉数值/卡号字段的
+// 填充前导 0（期望行为），但也会误伤"值本身以 0 开头且无填充"的 string 字段
+// （如 length=4 值 "0123" 文件 "0123" → 解析得 "123"）。
+// 约定：前导 0 有意义的字段禁用 fill="0"（用空格填充或 PAD_RIGHT）；fill="0" 仅用于数值/DECIMAL。
 func trimByPad(s string, padMode phys.PadMode, fill string) string {
 	if fill == "" {
 		fill = " "

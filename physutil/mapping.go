@@ -35,7 +35,7 @@ type converter interface {
 // BuildMapping 读源布局的 target 注解，建立映射并校验（§5.3/§3.5 规则 12）。
 func BuildMapping(srcL, dstL *CachedLayout) (*Mapping, error) {
 	m := &Mapping{srcDesc: srcL.desc, dstDesc: dstL.desc}
-	for _, sf := range srcL.Fields() {
+	for _, sf := range srcL.fields {
 		if sf.Target == "" || sf.Skip {
 			continue
 		}
